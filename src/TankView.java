@@ -25,8 +25,10 @@ public class TankView extends View implements SensorEventListener, View.OnTouchL
 
     private Bitmap tank, terrain, missile_image;
     private Tank tank_player;
+    private Tank enemy_player1, enemy_player2,enemy_player3;
     private int tank_size, missile_size;
-    private ArrayList<Tank> tanks;
+    //private ArrayList<Tank> tanks;
+    private ArrayList<Tank> tanks = new ArrayList<Tank>();
     private static final float TANK_SIZE_SCREEN_MODIFIER = 0.10f;
     private static final float MISSILE_SIZE_SCREEN_MODIFIER = 0.33f;
     private float x_origin, y_origin, horizontal_bound, vertical_bound;
@@ -38,7 +40,7 @@ public class TankView extends View implements SensorEventListener, View.OnTouchL
     private Sensor accelerometer;
     private Display display;
     private float frame_time = 0.25f; //Use this to control how much acceleration is used by tank
-                                      // Keep the accelerometer values low to keep tank slow
+    // Keep the accelerometer values low to keep tank slow
 
     public TankView(Context context) {
         super(context);
@@ -56,6 +58,14 @@ public class TankView extends View implements SensorEventListener, View.OnTouchL
         tank_player = new Tank(x_origin, y_origin);
         tanks.add(tank_player);
 
+        //tanks = new ArrayList<>();
+        enemy_player1 = new Tank(x_origin, y_origin);
+        enemy_player2 =new Tank(x_origin+10, y_origin+10);
+        enemy_player3 =new Tank(x_origin+20, y_origin+20);
+        //tanks.add(enemy_player1);
+        //tanks.add(enemy_player2);
+        //tanks.add(enemy_player3);
+
         // Scale tank size based on screen size
         tank_size = (int)(average(display_width, display_height) * TANK_SIZE_SCREEN_MODIFIER);
         missile_size = (int)(tank_size * MISSILE_SIZE_SCREEN_MODIFIER);
@@ -63,8 +73,8 @@ public class TankView extends View implements SensorEventListener, View.OnTouchL
         Bitmap tank_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.tank);
         tank = Bitmap.createScaledBitmap(tank_bitmap, tank_size, tank_size, true);
 
-        Bitmap missile_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.missile);
-        missile_image = Bitmap.createScaledBitmap(missile_bitmap, missile_size, missile_size, true);
+        //Bitmap missile_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.missile);
+        //missile_image = Bitmap.createScaledBitmap(missile_bitmap, missile_size, missile_size, true);
 
         Bitmap desert_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.desert);
         terrain = Bitmap.createScaledBitmap(desert_bitmap, display_width, display_height, true);
@@ -72,7 +82,26 @@ public class TankView extends View implements SensorEventListener, View.OnTouchL
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
-
+    public void createTanks(int hardness) {
+        //tanks = new ArrayList<>();
+        //tank_player = new Tank(x_origin, y_origin);
+        //tanks.add(tank_player);
+        if (hardness >= 1) {
+            //tanks = new ArrayList<>();
+            enemy_player1 = new Tank(x_origin-60, y_origin-60);
+            tanks.add(enemy_player1);
+        }
+        if (hardness >= 2) {
+            //tanks = new ArrayList<>();
+            enemy_player2 = new Tank(x_origin +60, y_origin+60);
+            tanks.add(enemy_player2);
+        }
+        if (hardness >= 3) {
+            //tanks = new ArrayList<>();
+            enemy_player3 = new Tank(x_origin +90, y_origin+90);
+            tanks.add(enemy_player3);
+        }
+    }
     @Override
     protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
         x_origin = width / 2.0f;
@@ -90,7 +119,12 @@ public class TankView extends View implements SensorEventListener, View.OnTouchL
 
         tank_player.updatePosition(accel_x, accel_y, frame_time);
         tank_player.resolveCollisionWithBounds(horizontal_bound, vertical_bound);
-
+        enemy_player1.updatePosition(accel_x, accel_y, frame_time);
+        enemy_player1.resolveCollisionWithBounds(horizontal_bound, vertical_bound);
+        enemy_player2.updatePosition(accel_x, accel_y, frame_time);
+        enemy_player2.resolveCollisionWithBounds(horizontal_bound, vertical_bound);
+        //enemy_player3.updatePosition(accel_x, accel_y, frame_time);
+        //enemy_player3.resolveCollisionWithBounds(horizontal_bound, vertical_bound);
         // Draw all missiles
         for (int i = 0; i < tanks.size(); i++) {
             for (int j = 0; j < tanks.get(i).getMissileList().size(); j++) {
@@ -103,6 +137,12 @@ public class TankView extends View implements SensorEventListener, View.OnTouchL
 
         canvas.drawBitmap(tank, (x_origin - tank_size/2) + tank_player.getX(),
                 (y_origin - tank_size/2) - tank_player.getY(), null);
+        canvas.drawBitmap(tank, (x_origin - tank_size/2) + enemy_player1.getX(),
+                (y_origin - tank_size/2) - enemy_player1.getY(), null);
+        canvas.drawBitmap(tank, (x_origin - tank_size/2) + enemy_player2.getX(),
+                (y_origin - tank_size/2) - enemy_player2.getY(), null);
+        //canvas.drawBitmap(tank, (x_origin - tank_size/2) + enemy_player3.getX(),
+         //       (y_origin - tank_size/2) - enemy_player3.getY(), null);
 
         invalidate();
     }
