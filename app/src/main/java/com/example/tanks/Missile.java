@@ -39,11 +39,11 @@ public class Missile {
      * @param location shows missile location
      */
 
-	public Missile(float x, float y, float missile_dx, float missile_dy) {
-		position_x = x;
+    public Missile(float x, float y, float missile_dx, float missile_dy) {
+        position_x = x;
         position_y = y;
         setMissileDirection(missile_dx, missile_dy);
-	}
+    }
     /**
      * getter for location of x point of missile
      */
