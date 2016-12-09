@@ -21,12 +21,11 @@ public class Missile {
         public int getValue() {
             return value;
         }
-    };
+    }
 
-	private static final long serialVersionUID = 1L;
     private float position_x, position_y;
     private Direction x_direction, y_direction;
-    private static final float VELOCITY = 5;
+    private static final float VELOCITY = 7.5f;
     private Bitmap missile_image;
 
 
