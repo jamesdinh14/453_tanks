@@ -1,6 +1,8 @@
 package com.example.tanks;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import static com.example.tanks.Missile.Direction.*;
 
@@ -24,14 +26,16 @@ public class Missile {
 	private static final long serialVersionUID = 1L;
     private float position_x, position_y;
     private Direction x_direction, y_direction;
-    private static final float VELOCITY = 25;
-	private int size = 30;
+    private static final float VELOCITY = 5;
+    private Bitmap missile_image;
 
 
-	public Missile(float x, float y, float missile_dx, float missile_dy) {
+	public Missile(float x, float y, float missile_dx, float missile_dy, Resources r, int missile_size) {
 		position_x = x;
         position_y = y;
         setMissileDirection(missile_dx, missile_dy);
+        Bitmap missile_bitmap = BitmapFactory.decodeResource(r, R.drawable.missile);
+        missile_image = Bitmap.createScaledBitmap(missile_bitmap, missile_size, missile_size, true);
 	}
 
 	public float getX() {
@@ -53,4 +57,7 @@ public class Missile {
         position_y += VELOCITY * y_direction.getValue();
 	}
 
+    public Bitmap getMissileImage() {
+        return missile_image;
+    }
 }

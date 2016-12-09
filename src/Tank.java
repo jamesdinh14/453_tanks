@@ -1,5 +1,6 @@
 package com.example.tanks;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 
@@ -31,8 +32,8 @@ public class Tank {
 		return position_x;
 	}
 
-	protected void fireMissile(float x, float y, float missile_dx, float missile_dy) {
-		missileList.add(new Missile(x, y, missile_dx, missile_dy));
+	protected void fireMissile(float x, float y, float missile_dx, float missile_dy, Resources r, int missile_size) {
+		missileList.add(new Missile(x, y, missile_dx, missile_dy, r, missile_size));
 	}
 
 	public ArrayList<Missile> getMissileList() {

@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -21,19 +22,17 @@ import java.util.ArrayList;
  * Created by James on 11/16/2016.
  */
 
-public class TankView extends View implements SensorEventListener, View.OnTouchListener {
+public class TankView extends View implements SensorEventListener/*, View.OnTouchListener*/ {
 
-    private Bitmap tank, terrain, missile_image;
+    private Bitmap tank, terrain;
     private Tank tank_player;
     private Tank enemy_player1, enemy_player2,enemy_player3;
     private int tank_size, missile_size;
-    //private ArrayList<Tank> tanks;
     private ArrayList<Tank> tanks = new ArrayList<Tank>();
     private static final float TANK_SIZE_SCREEN_MODIFIER = 0.10f;
     private static final float MISSILE_SIZE_SCREEN_MODIFIER = 0.33f;
     private float x_origin, y_origin, horizontal_bound, vertical_bound;
-    private float accel_x, accel_y, accel_z;
-    private long timestamp;
+    private float accel_x, accel_y;
     private float missile_direction_x, missile_direction_y;
 
     private SensorManager sensorManager;
@@ -58,10 +57,9 @@ public class TankView extends View implements SensorEventListener, View.OnTouchL
         tank_player = new Tank(x_origin, y_origin);
         tanks.add(tank_player);
 
-        //tanks = new ArrayList<>();
         enemy_player1 = new Tank(x_origin, y_origin);
-        enemy_player2 =new Tank(x_origin+10, y_origin+10);
-        enemy_player3 =new Tank(x_origin+20, y_origin+20);
+        enemy_player2 = new Tank(x_origin+10, y_origin+10);
+        enemy_player3 = new Tank(x_origin+20, y_origin+20);
         //tanks.add(enemy_player1);
         //tanks.add(enemy_player2);
         //tanks.add(enemy_player3);
@@ -73,8 +71,8 @@ public class TankView extends View implements SensorEventListener, View.OnTouchL
         Bitmap tank_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.tank);
         tank = Bitmap.createScaledBitmap(tank_bitmap, tank_size, tank_size, true);
 
-        //Bitmap missile_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.missile);
-        //missile_image = Bitmap.createScaledBitmap(missile_bitmap, missile_size, missile_size, true);
+//        Bitmap missile_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.missile);
+//        missile_image = Bitmap.createScaledBitmap(missile_bitmap, missile_size, missile_size, true);
 
         Bitmap desert_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.desert);
         terrain = Bitmap.createScaledBitmap(desert_bitmap, display_width, display_height, true);
@@ -82,6 +80,7 @@ public class TankView extends View implements SensorEventListener, View.OnTouchL
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
+
     public void createTanks(int hardness) {
         //tanks = new ArrayList<>();
         //tank_player = new Tank(x_origin, y_origin);
@@ -102,6 +101,7 @@ public class TankView extends View implements SensorEventListener, View.OnTouchL
             tanks.add(enemy_player3);
         }
     }
+
     @Override
     protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
         x_origin = width / 2.0f;
@@ -130,7 +130,7 @@ public class TankView extends View implements SensorEventListener, View.OnTouchL
             for (int j = 0; j < tanks.get(i).getMissileList().size(); j++) {
                 Missile missile = tanks.get(i).getMissileList().get(j);
                 missile.moveMissile();
-                canvas.drawBitmap(missile_image, (x_origin - missile_size/2) + missile.getX(),
+                canvas.drawBitmap(missile.getMissileImage(), (x_origin - missile_size/2) + missile.getX(),
                         (y_origin - missile_size/2) - missile.getY(), null);
             }
         }
@@ -150,7 +150,6 @@ public class TankView extends View implements SensorEventListener, View.OnTouchL
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-
             if (display.getRotation() == Surface.ROTATION_0) {
                 accel_x = event.values[0];
                 accel_y = event.values[1];
@@ -160,9 +159,6 @@ public class TankView extends View implements SensorEventListener, View.OnTouchL
                 accel_x = -event.values[1];
                 accel_y = event.values[0];
             }
-
-            accel_z = event.values[2];
-            timestamp = event.timestamp;
         }
     }
 
@@ -171,13 +167,26 @@ public class TankView extends View implements SensorEventListener, View.OnTouchL
 
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        missile_direction_x = event.getX();
-        missile_direction_y = event.getY();
-        tank_player.fireMissile(tank_player.getX(), tank_player.getY(),
-                missile_direction_x, missile_direction_y);
-        return true;
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+//            missile_direction_x = event.getX();
+//            missile_direction_y = event.getY();
+//            MotionEvent.PointerCoords pointerCoords = new MotionEvent.PointerCoords();
+//            event.getPointerCoords(0, pointerCoords);
+
+            // Shift the event event origin (0,0) from the top-left to somewhere close to
+            // the middle of the screen
+            missile_direction_x = event.getX() - x_origin - tank_player.getX();
+            missile_direction_y = -(event.getY() - y_origin) - tank_player.getY();
+            Toast.makeText(this.getContext(), "x-direction: " + missile_direction_x + "\ny-direction:" + missile_direction_y
+                    + "\ntank-position-x: " + tank_player.getX() + "\ntank-position-y: " + tank_player.getY(), Toast.LENGTH_SHORT).show();
+            tank_player.fireMissile(tank_player.getX(), tank_player.getY(),
+                    missile_direction_x, missile_direction_y, getResources(), missile_size);
+            return true;
+        }
+
+
+        return false;
     }
 
     public void resumeGame() {
