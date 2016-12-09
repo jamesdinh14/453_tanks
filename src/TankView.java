@@ -160,8 +160,6 @@ public class TankView extends View implements SensorEventListener/*, View.OnTouc
             // the middle of the screen
             float missile_direction_x = event.getX() - x_origin - tank_player.getX();
             float missile_direction_y = -(event.getY() - y_origin) - tank_player.getY();
-            Toast.makeText(this.getContext(), "x-direction: " + missile_direction_x + "\ny-direction:" + missile_direction_y
-                    + "\ntank-position-x: " + tank_player.getX() + "\ntank-position-y: " + tank_player.getY(), Toast.LENGTH_SHORT).show();
             tank_player.fireMissile(tank_player.getX(), tank_player.getY(),
                     missile_direction_x, missile_direction_y, getResources(), missile_size);
             return true;
